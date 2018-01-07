@@ -61,8 +61,11 @@
     <Compile Include="AuditLog\ActionType.cs" />
     <Compile Include="AuditLog\AuditLog.cs" />
     <Compile Include="AuditLog\ChangeLog.cs" />
+    <Compile Include="AuditLog\CreateLog.cs" />
+    <Compile Include="AuditLog\EntityValue.cs" />
     <Compile Include="AuditLog\IgnoreLogAttribute.cs" />
     <Compile Include="AuditLog\ObjectChangeLog.cs" />
+    <Compile Include="AuditLog\ObjectExtention.cs" />
     <Compile Include="Entities\ApplicationDbContext.cs" />
     <Compile Include="Entities\ApplicationUser.cs" />
     <Compile Include="Entities\Sample.cs" />

@@ -34,10 +34,8 @@ namespace AzR.AuditLog.Business.Models
             var ent = new ApplicationDbContext();
             Sample rec = ent.Samples.FirstOrDefault(s => s.Id == id);
             if (rec == null) return;
-            var dummyObject = new Sample(); // Storage of this null object shows data after delete = nix, naught, nothing!
             rec.Deleted = true;
             ent.SaveChanges();
-            ChangeLog.Create<Sample>(ActionType.Delete, id, rec, dummyObject);
         }
 
 
@@ -60,11 +58,11 @@ namespace AzR.AuditLog.Business.Models
                 .ToList();
         }
 
-        public bool UpdateRecord(SampleModel rec)
+        public bool UpdateRecord(SampleModel model)
         {
             bool rslt = false;
             var ent = new ApplicationDbContext();
-            var dbRec = ent.Samples.FirstOrDefault(s => s.Id == rec.Id);
+            var dbRec = ent.Samples.FirstOrDefault(s => s.Id == model.Id);
             if (dbRec == null) return false;
             // audit process 1 - gather old values
             var oldRecord = new SampleModel
@@ -75,9 +73,9 @@ namespace AzR.AuditLog.Business.Models
                 DateOfBirth = dbRec.DateOfBirth
             };
             // update the live record
-            dbRec.FirstName = rec.FirstName;
-            dbRec.LastName = rec.Lastname;
-            dbRec.DateOfBirth = rec.DateOfBirth;
+            dbRec.FirstName = model.FirstName;
+            dbRec.LastName = model.Lastname;
+            dbRec.DateOfBirth = model.DateOfBirth;
             ent.SaveChanges();
 
             //ChangeLog.Create<Sample>(ActionType.Update, Rec.Id, oldRecord, Rec);
@@ -85,15 +83,15 @@ namespace AzR.AuditLog.Business.Models
             return true;
         }
 
-        public void CreateRecord(SampleModel rec)
+        public void CreateRecord(SampleModel model)
         {
 
             var ent = new ApplicationDbContext();
             var dbRec = new Sample
             {
-                FirstName = rec.FirstName,
-                LastName = rec.Lastname,
-                DateOfBirth = rec.DateOfBirth
+                FirstName = model.FirstName,
+                LastName = model.Lastname,
+                DateOfBirth = model.DateOfBirth
             };
             ent.Samples.Add(dbRec);
             ent.SaveChanges(); // save first so we get back the dbRec.Id for audit tracking

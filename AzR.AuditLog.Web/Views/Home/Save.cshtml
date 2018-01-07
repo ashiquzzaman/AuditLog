@@ -1,0 +1,81 @@
+﻿@model AzR.AuditLog.Business.Models.SampleModel
+
+@{
+    var CurrentAction = ViewContext.RouteData.Values["action"].ToString();
+}
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true"><i class="fa fa-times-circle"></i></span>
+    </button>
+    <h4 class="modal-title">
+        @if (CurrentAction == "Edit")
+        {
+            @:Edit Record
+        }
+        else
+        {
+            @:Add Record
+        }
+    </h4>
+</div>
+<div class="modal-body">
+
+    @using (Ajax.BeginForm("Save", "Home", new { Area = "" }, new AjaxOptions
+    {
+        HttpMethod = "POST",
+        OnSuccess = "redirectOnSuccess",
+    }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-horizontal">
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+            @Html.HiddenFor(model => model.Id)
+            <div class="form-group">
+                @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Lastname, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Lastname, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Lastname, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-2 control-label" style="font-weight: normal;">Start Date</label>
+                <div class="col-md-10">
+                    <div class="input-group" id="divDate">
+                        @Html.TextBoxFor(m => m.DateOfBirth, "{0:MMM dd, yyyy}", new {@class = "form-control"})
+                        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Deleted, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <label for="Active" class="control-label">
+                        @Html.RadioButtonFor(model => model.Deleted, true, new { id = "Active" }) YES
+                    </label>
+                    <label for="InActive" class="control-label">
+                        @Html.RadioButtonFor(model => model.Deleted, false, new { id = "InActive" }) NO
+                    </label>
+                    @Html.ValidationMessageFor(model => model.Deleted, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group modal-footer">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" class="btn btn-dropbox" />
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<script>
+    $("#divDate").datetimepicker({ format: 'MMM DD, YYYY', maxDate: moment() });
+</script>

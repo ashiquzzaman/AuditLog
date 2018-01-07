@@ -5,25 +5,25 @@
     <h1>Audit log example</h1> <br />
     <a href="/" class="btn btn-default">Show only live </a>
     <a href="#" class="btn btn-default" onClick="ShowDeleted()">Show all records </a>
-    <a href="#" class="btn btn-default pull-right" onClick="NewRecord()">New record </a>
+    <span class="btn btn-default pull-right" onClick="createModal('@Url.Action("Create","Home")')">New record </span>
     <br /><br />
     <table class='table table-condensed'>
         <thead></thead>
-        @foreach (var rec in Model)
+        @foreach (var item in Model)
         {
-            <tr id="@rec.Id" @(rec.Deleted == false ? String.Empty : "class=alert-danger" )>
+            <tr id="@item.Id" @(item.Deleted == false ? String.Empty : "class=alert-danger" )>
 
-                <td><a href="/home/edit/@rec.Id">Edit</a> <a href="#" onClick="DeleteRecord(@rec.Id)">Delete</a> </td>
+                <td><span onClick="createModal('@Url.Action("Edit","Home",new{id=item.Id})')">Edit</span> <span onClick="DeleteRecord(@item.Id)">Delete</span> </td>
                 <td>
-                    @rec.FirstName
+                    @item.FirstName
                 </td>
                 <td>
-                    @rec.Lastname
+                    @item.Lastname
                 </td>
                 <td>
-                    @rec.DateOfBirth.ToShortDateString()
+                    @item.DateOfBirth.ToShortDateString()
                 </td>
-                <td><a href="#" onClick="GetAuditHistory(@rec.Id)">Audit</a></td>
+                <td><a href="#" onClick="GetAuditHistory(@item.Id)">Audit</a></td>
             </tr>
         }
     </table>

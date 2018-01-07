@@ -9,7 +9,7 @@ namespace AzR.AuditLog.Web.Controllers
     {
         public ActionResult Index(bool ShowDeleted = false)
         {
-            SampleModel SD = new SampleModel();
+            var SD = new SampleModel();
             return View(SD.GetAllData(ShowDeleted));
         }
 
@@ -17,23 +17,27 @@ namespace AzR.AuditLog.Web.Controllers
         public ActionResult Edit(int id)
         {
             SampleModel SD = new SampleModel();
-            return View(SD.GetData(id));
+            return PartialView("Save", SD.GetData(id));
         }
 
         public ActionResult Create()
         {
-            SampleModel SD = new SampleModel();
-            SD.Id = -1; // indicates record not yet saved
-            SD.DateOfBirth = DateTime.Now.AddYears(-25);
-            return View("Edit", SD);
+            var SD = new SampleModel
+            {
+                Id = -1,
+                DateOfBirth = DateTime.Now.AddYears(-25)
+            };
+            // indicates record not yet saved
+            return PartialView("Save", SD);
         }
 
         public void Delete(int id)
         {
-            SampleModel SD = new SampleModel();
+            var SD = new SampleModel();
             SD.DeleteRecord(id);
         }
-
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Save(SampleModel Rec)
         {
             SampleModel SD = new SampleModel();
@@ -45,7 +49,14 @@ namespace AzR.AuditLog.Web.Controllers
             {
                 SD.UpdateRecord(Rec);
             }
-            return Redirect("/");
+            return
+                Json(
+                    new
+                    {
+                        redirectTo = Url.Action("Index", "Home", new { Area = "" }),
+                        message = "Record Saved successfully!!!",
+                        position = "mainContent"
+                    });
         }
 
         public JsonResult Audit(int id)

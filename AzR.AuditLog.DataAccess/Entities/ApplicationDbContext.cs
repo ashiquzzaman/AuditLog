@@ -1,12 +1,9 @@
 using AzR.AuditLog.DataAccess.AuditLog;
 using Microsoft.AspNet.Identity.EntityFramework;
-using System;
 using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Transactions;
-//https://stackoverflow.com/questions/19797820/how-to-get-id-from-entity-for-auditlog-in-entity-framework-6
-//https://stackoverflow.com/questions/20961489/how-to-create-an-audit-trail-with-entity-framework-5-and-mvc-4
+
 namespace AzR.AuditLog.DataAccess.Entities
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
@@ -30,12 +27,14 @@ namespace AzR.AuditLog.DataAccess.Entities
 
                 foreach (var entry in modifiedEntries)
                 {
-                    //ApplyAuditLog(entry);
+                    var audit = CreateLog.Create(entry);
+                    AuditLogs.Add(audit);
                 }
-
                 int changes = base.SaveChanges();
                 foreach (var entry in addedEntries)
                 {
+                    var audit = CreateLog.Create(entry);
+                    AuditLogs.Add(audit);
 
                 }
 
@@ -43,27 +42,6 @@ namespace AzR.AuditLog.DataAccess.Entities
                 scope.Complete();
                 return changes;
             }
-        }
-
-        private void ApplyAuditLog(DbEntityEntry entry)
-        {
-            ActionType operation;
-            switch (entry.State)
-            {
-                case EntityState.Added:
-                    operation = ActionType.Create;
-                    break;
-                case EntityState.Deleted:
-                    operation = ActionType.Delete;
-                    break;
-                case EntityState.Modified:
-                    operation = ActionType.Update;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            //ApplyAuditLog(entry, operation);
         }
 
 

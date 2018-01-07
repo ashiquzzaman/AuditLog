@@ -25,7 +25,16 @@
     <footer>
     </footer>
 </div>
-
+@Scripts.Render("~/bundles/jqueryval")
+@Scripts.Render("~/bundles/jqueryunobtrusive")
+<script>
+    $(function () {
+        $(document).ajaxComplete(function () {
+            $.validator.unobtrusive.parse(document);
+        });
+        $('#dashboard').click();
+    });
+</script>
     @RenderSection("scripts", required: false)
 </body>
 </html>
