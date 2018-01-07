@@ -1,0 +1,35 @@
+﻿@model AzR.AuditLog.Business.Models.SampleModel
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+
+<div>
+   <h1>Audit log example</h1> <br />
+
+          <form method="post" action="/home/Save">
+
+              <input type="hidden" name="ID" value="@Model.Id" />
+              <div>
+                  <input type="text" name="FirstName" value="@Model.FirstName" />
+              </div>
+              <div>
+                  <input type="text" name="LastName" value="@Model.Lastname" />
+              </div>
+              <div>
+                  <input type="text" name="DateOfBirth" value="@Model.DateOfBirth.ToShortDateString()" />
+              </div>
+              <div>
+                  <input type="submit" />
+              </div>
+
+          </form>
+
+ 
+        
+
+
+
+
+</div>

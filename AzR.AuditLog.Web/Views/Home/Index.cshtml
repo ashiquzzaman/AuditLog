@@ -1,0 +1,56 @@
+﻿@model IEnumerable<AzR.AuditLog.Business.Models.SampleModel>
+
+
+<div>
+    <h1>Audit log example</h1> <br />
+    <a href="/" class="btn btn-default">Show only live </a>
+    <a href="#" class="btn btn-default" onClick="ShowDeleted()">Show all records </a>
+    <a href="#" class="btn btn-default pull-right" onClick="NewRecord()">New record </a>
+    <br /><br />
+    <table class='table table-condensed'>
+        <thead></thead>
+        @foreach (var rec in Model)
+        {
+            <tr id="@rec.Id" @(rec.Deleted == false ? String.Empty : "class=alert-danger" )>
+
+                <td><a href="/home/edit/@rec.Id">Edit</a> <a href="#" onClick="DeleteRecord(@rec.Id)">Delete</a> </td>
+                <td>
+                    @rec.FirstName
+                </td>
+                <td>
+                    @rec.Lastname
+                </td>
+                <td>
+                    @rec.DateOfBirth.ToShortDateString()
+                </td>
+                <td><a href="#" onClick="GetAuditHistory(@rec.Id)">Audit</a></td>
+            </tr>
+        }
+    </table>
+
+
+</div>
+
+<script>
+    function GetAuditHistory(recordID) {
+        $("#modelContent").html("");
+        $.getJSON("/home/audit/" + recordID, function (auditLogs) {
+            if (auditLogs.length === 0) return;
+           var compiled = render('AuditLog', { auditLogs: auditLogs});
+            $("#modelContent").html(compiled);
+           
+        });
+        $('#myModal').modal('show');
+    }
+    function DeleteRecord(recordID) {
+        $.get("/home/delete/" + recordID); // should have return on success etc
+        $('#' + recordID).remove();
+    }
+    function ShowDeleted() {
+        window.location.assign('/?ShowDeleted=True');
+    }
+    function NewRecord() {
+        window.location.assign('/home/create');
+    }
+</script>
+
