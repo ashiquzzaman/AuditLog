@@ -1,53 +1,58 @@
 ﻿using AzR.AuditLog.Business.Models;
+using AzR.AuditLog.Business.Services;
 using System;
 using System.Web.Mvc;
 
 namespace AzR.AuditLog.Web.Controllers
 {
     [Authorize]
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
+        private SampleService _sample;
+
+        public HomeController(SampleService sample)
+        {
+            _sample = sample;
+        }
+
         public ActionResult Index(bool ShowDeleted = false)
         {
-            var SD = new SampleModel();
-            return View(SD.GetAllData(ShowDeleted));
+            return View(_sample.GetAll(ShowDeleted));
         }
 
 
         public ActionResult Edit(int id)
         {
-            SampleModel SD = new SampleModel();
-            return PartialView("Save", SD.GetData(id));
+            var model = _sample.Get(id);
+            return PartialView("Save", model);
         }
 
         public ActionResult Create()
         {
-            var SD = new SampleModel
+            var model = new SampleViewModel
             {
                 Id = -1,
-                DateOfBirth = DateTime.Now.AddYears(-25)
+                DateOfBirth = DateTime.Now.AddYears(-25),
+                Active = true,
             };
-            // indicates record not yet saved
-            return PartialView("Save", SD);
+            return PartialView("Save", model);
         }
 
         public void Delete(int id)
         {
-            var SD = new SampleModel();
-            SD.DeleteRecord(id);
+            _sample.Delete(id);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Save(SampleModel Rec)
+        public ActionResult Save(SampleViewModel Rec)
         {
-            SampleModel SD = new SampleModel();
             if (Rec.Id == -1)
             {
-                SD.CreateRecord(Rec);
+                _sample.Create(Rec);
             }
             else
             {
-                SD.UpdateRecord(Rec);
+                _sample.Update(Rec);
             }
             return
                 Json(
@@ -61,9 +66,8 @@ namespace AzR.AuditLog.Web.Controllers
 
         public JsonResult Audit(int id)
         {
-            SampleModel SD = new SampleModel();
-            var AuditTrail = SD.GetAudit(id);
-            return Json(AuditTrail, JsonRequestBehavior.AllowGet);
+            var logs = _sample.GetAudit(id);
+            return Json(logs, JsonRequestBehavior.AllowGet);
         }
 
 

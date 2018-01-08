@@ -7,7 +7,8 @@ namespace AzR.AuditLog.DataAccess.AuditLog
     {
         public long Id { get; set; }
         public long LoginId { get; set; }
-        public int KeyFieldId { get; set; }
+        [StringLength(128)]
+        public string KeyFieldId { get; set; }
         public DateTime ActionTime { get; set; }
         [StringLength(256)]
         public string EntityName { get; set; }

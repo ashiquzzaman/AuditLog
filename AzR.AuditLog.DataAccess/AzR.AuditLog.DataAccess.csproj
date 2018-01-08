@@ -71,6 +71,12 @@
     <Compile Include="Entities\Sample.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\AuditLogRepository.cs" />
+    <Compile Include="Repositories\IAuditLogRepository.cs" />
+    <Compile Include="Repositories\IRepository.cs" />
+    <Compile Include="Repositories\ISampleRepository.cs" />
+    <Compile Include="Repositories\Repository.cs" />
+    <Compile Include="Repositories\SampleRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -1,4 +1,6 @@
+using AzR.AuditLog.Business.Services;
 using AzR.AuditLog.DataAccess.Entities;
+using AzR.AuditLog.DataAccess.Repositories;
 using AzR.AuditLog.Web.Controllers;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -20,8 +22,21 @@ namespace AzR.AuditLog.Web
             container.RegisterType<UserManager<ApplicationUser>>();
             container.RegisterType<DbContext, ApplicationDbContext>();
             container.RegisterType<ApplicationUserManager>();
+
+
+            container.RegisterType<IAuditLogRepository, AuditLogRepository>();
+            container.RegisterType<ISampleRepository, SampleRepository>();
+            container.RegisterType<ISampleService, SampleService>();
+
+
+
             container.RegisterType<AccountController>(new InjectionConstructor());
             container.RegisterType<ManageController>(new InjectionConstructor());
+
+
+
+
+
 
             DependencyResolver.SetResolver(new UnityDependencyResolver(container));
         }

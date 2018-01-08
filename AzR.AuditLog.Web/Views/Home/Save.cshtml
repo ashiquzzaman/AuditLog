@@ -1,4 +1,4 @@
-﻿@model AzR.AuditLog.Business.Models.SampleModel
+﻿@model AzR.AuditLog.Business.Models.SampleViewModel
 
 @{
     var CurrentAction = ViewContext.RouteData.Values["action"].ToString();
@@ -32,22 +32,21 @@
 
             @Html.HiddenFor(model => model.Id)
             <div class="form-group">
-                @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
+                @Html.LabelFor(model => model.FirstName, htmlAttributes: new { @class = "control-label col-md-4" })
+                <div class="col-md-6">
                     @Html.EditorFor(model => model.FirstName, new { htmlAttributes = new { @class = "form-control" } })
                     @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
                 </div>
             </div>
             <div class="form-group">
-                @Html.LabelFor(model => model.Lastname, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.Lastname, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.Lastname, "", new { @class = "text-danger" })
+                @Html.LabelFor(model => model.LastName, htmlAttributes: new { @class = "control-label col-md-4" })
+                <div class="col-md-6">
+                    @Html.EditorFor(model => model.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
                 </div>
             </div>
             <div class="form-group">
-                <label class="col-md-2 control-label" style="font-weight: normal;">Start Date</label>
-                <div class="col-md-10">
+                @Html.LabelFor(model => model.DateOfBirth, htmlAttributes: new { @class = "control-label col-md-4" })                <div class="col-md-6">
                     <div class="input-group" id="divDate">
                         @Html.TextBoxFor(m => m.DateOfBirth, "{0:MMM dd, yyyy}", new {@class = "form-control"})
                         <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
@@ -55,21 +54,21 @@
                 </div>
             </div>
             <div class="form-group">
-                @Html.LabelFor(model => model.Deleted, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
+                @Html.LabelFor(model => model.Active, htmlAttributes: new { @class = "control-label col-md-4" })
+                <div class="col-md-6">
                     <label for="Active" class="control-label">
-                        @Html.RadioButtonFor(model => model.Deleted, true, new { id = "Active" }) YES
+                        @Html.RadioButtonFor(model => model.Active, true, new { id = "Active" }) YES
                     </label>
                     <label for="InActive" class="control-label">
-                        @Html.RadioButtonFor(model => model.Deleted, false, new { id = "InActive" }) NO
+                        @Html.RadioButtonFor(model => model.Active, false, new { id = "InActive" }) NO
                     </label>
-                    @Html.ValidationMessageFor(model => model.Deleted, "", new { @class = "text-danger" })
+                    @Html.ValidationMessageFor(model => model.Active, "", new { @class = "text-danger" })
                 </div>
             </div>
 
             <div class="form-group modal-footer">
                 <div class="col-md-offset-2 col-md-10">
-                    <input type="submit" value="Save" class="btn btn-dropbox" />
+                    <input type="submit" value="Save" class="btn btn-primary" />
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                 </div>
             </div>

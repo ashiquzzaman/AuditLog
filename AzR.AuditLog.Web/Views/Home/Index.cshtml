@@ -1,4 +1,4 @@
-﻿@model IEnumerable<AzR.AuditLog.Business.Models.SampleModel>
+﻿@model IEnumerable<AzR.AuditLog.Business.Models.SampleViewModel>
 
 
 <div>
@@ -11,14 +11,14 @@
         <thead></thead>
         @foreach (var item in Model)
         {
-            <tr id="@item.Id" @(item.Deleted == false ? String.Empty : "class=alert-danger" )>
+            <tr id="@item.Id" @(item.Active ? String.Empty : "class=alert-danger" )>
 
                 <td><span onClick="createModal('@Url.Action("Edit","Home",new{id=item.Id})')">Edit</span> <span onClick="DeleteRecord(@item.Id)">Delete</span> </td>
                 <td>
                     @item.FirstName
                 </td>
                 <td>
-                    @item.Lastname
+                    @item.LastName
                 </td>
                 <td>
                     @item.DateOfBirth.ToShortDateString()

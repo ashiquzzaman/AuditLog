@@ -1,6 +1,9 @@
 using AzR.AuditLog.DataAccess.AuditLog;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System;
+using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.Linq;
 using System.Transactions;
 
@@ -20,27 +23,70 @@ namespace AzR.AuditLog.DataAccess.Entities
 
         public override int SaveChanges()
         {
-            using (var scope = new TransactionScope())
+            try
             {
-                var addedEntries = ChangeTracker.Entries().Where(e => e.State == EntityState.Added).ToList();
-                var modifiedEntries = ChangeTracker.Entries().Where(e => e.State == EntityState.Deleted || e.State == EntityState.Modified).ToList();
-
-                foreach (var entry in modifiedEntries)
+                using (var scope = new TransactionScope())
                 {
-                    var audit = CreateLog.Create(entry);
-                    AuditLogs.Add(audit);
+                    var addedEntries = ChangeTracker.Entries().Where(e => e.State == EntityState.Added).ToList();
+                    var modifiedEntries = ChangeTracker.Entries().Where(e => e.State == EntityState.Modified).ToList();
+                    var deleteEntries = ChangeTracker.Entries().Where(e => e.State == EntityState.Deleted).ToList();
+
+                    var changes = 0;
+                    if (deleteEntries.Count > 0)
+                    {
+                        foreach (var entry in deleteEntries)
+                        {
+                            var audit = CreateLog.Create(entry, 3);
+                            AuditLogs.Add(audit);
+                        }
+                        changes = base.SaveChanges();
+                    }
+
+                    if (modifiedEntries.Count > 0)
+                    {
+                        foreach (var entry in modifiedEntries)
+                        {
+                            var audit = CreateLog.Create(entry, 2);
+                            AuditLogs.Add(audit);
+                        }
+                        changes = base.SaveChanges();
+                    }
+
+                    if (addedEntries.Count > 0)
+                    {
+
+                        foreach (var entry in addedEntries)
+                        {
+                            var audit = CreateLog.Create(entry, 1);
+                            AuditLogs.Add(audit);
+                        }
+
+                        changes = base.SaveChanges();
+                    }
+
+                    scope.Complete();
+                    return changes;
                 }
-                int changes = base.SaveChanges();
-                foreach (var entry in addedEntries)
+
+            }
+            catch (DbEntityValidationException ex)
+            {
+                var outputLines = new List<string>();
+                foreach (var eve in ex.EntityValidationErrors)
                 {
-                    var audit = CreateLog.Create(entry);
-                    AuditLogs.Add(audit);
-
+                    outputLines.Add(string.Format(
+                        "{0}: Entity of type \"{1}\" in state \"{2}\" has the following validation errors:",
+                        DateTime.Now, eve.Entry.Entity.GetType().Name, eve.Entry.State));
+                    foreach (var ve in eve.ValidationErrors)
+                    {
+                        outputLines.Add(string.Format(
+                            "- Property: \"{0}\", Error: \"{1}\"",
+                            ve.PropertyName, ve.ErrorMessage));
+                    }
                 }
+                //GeneralHelper.WriteValue(string.Join("\n", outputLines));
+                throw new Exception(string.Join(",", outputLines.ToArray()));
 
-                base.SaveChanges();
-                scope.Complete();
-                return changes;
             }
         }
 

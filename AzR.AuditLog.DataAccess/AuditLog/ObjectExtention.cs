@@ -30,7 +30,7 @@ namespace AzR.AuditLog.DataAccess.AuditLog
                     }).ToList();
         }
 
-        public static IEnumerable<ObjectChangeLog> Compare(this object newModel)
+        public static IEnumerable<ObjectChangeLog> ToChangeLog(this object newModel)
         {
             var properties = newModel.GetType().GetProperties();
             return (from property in properties

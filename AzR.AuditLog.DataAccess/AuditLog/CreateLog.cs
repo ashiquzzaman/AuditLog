@@ -2,14 +2,14 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Linq;
 
 namespace AzR.AuditLog.DataAccess.AuditLog
 {
     public class CreateLog
     {
-        public static void Create<T>(ActionType action, int keyFieldId, T oldObject, T newObject)
+        public static void Create<T>(ActionType action, string keyFieldId, T oldObject, T newObject)
         {
             // get the difference
             var deltaList = newObject.Compare(oldObject);
@@ -32,52 +32,55 @@ namespace AzR.AuditLog.DataAccess.AuditLog
             ent.SaveChanges();
 
         }
-        public static AuditLog Create(DbEntityEntry entry)
+        public static AuditLog Create(DbEntityEntry entry, int status)
         {
 
-            ActionType operation;
-            switch (entry.State)
+            var actionType = (ActionType)status;
+            object oldObject, newObject;
+            string keyValue;
+            IEnumerable<ObjectChangeLog> deltaList;
+            var eType = entry.Entity.GetType();
+            var type = Type.GetType(eType.FullName);
+
+            switch (actionType)
             {
-                case EntityState.Added:
-                    operation = ActionType.Create;
-                    break;
-                case EntityState.Deleted:
-                    operation = ActionType.Delete;
-                    break;
-                case EntityState.Modified:
-                    operation = ActionType.Update;
-                    break;
-                case EntityState.Unchanged:
-                    operation = ActionType.Create;
+                case ActionType.Create:
+                    {
+
+                        oldObject = Activator.CreateInstance(type);
+                        newObject = EntityValue.NewObject(entry);
+                        deltaList = newObject.ToChangeLog();
+                        keyValue = entry.CurrentValues.GetValue<object>("Id").ToString();
+                        break;
+                    }
+                case ActionType.Delete:
+                    oldObject = EntityValue.OldObject(entry);
+                    newObject = oldObject;
+                    deltaList = newObject.Compare(oldObject);
+                    keyValue = entry.OriginalValues.GetValue<object>("Id").ToString();
                     break;
                 default:
-                    operation = ActionType.Create;
-                    break;
-            }
-
-            object oldObject;
-            IEnumerable<ObjectChangeLog> deltaList;
-            var newObject = EntityValue.NewObject(entry);
-            var eType = entry.Entity.GetType();
-            if (entry.State == EntityState.Added)
-            {
-                var type = Type.GetType(eType.FullName);
-                oldObject = Activator.CreateInstance(type);
-                deltaList = newObject.Compare();
-            }
-            else
-            {
-                oldObject = EntityValue.OldObject(entry);
-                deltaList = newObject.Compare(oldObject);
+                    {
+                        if (entry.OriginalValues.PropertyNames.Any(s => s == "Active") &&
+                            !entry.CurrentValues.GetValue<bool>("Active"))
+                        {
+                            actionType = ActionType.Remove;
+                        }
+                        newObject = EntityValue.NewObject(entry);
+                        oldObject = EntityValue.OldObject(entry);
+                        deltaList = newObject.Compare(oldObject);
+                        keyValue = entry.OriginalValues.GetValue<object>("Id").ToString();
+                        break;
+                    }
             }
 
             var audit = new AuditLog
             {
                 LoginId = 0,
-                ActionType = operation,
+                ActionType = actionType,
                 EntityName = eType.Name,
                 ActionTime = DateTime.Now,
-                KeyFieldId = entry.OriginalValues.GetValue<int>("Id"),
+                KeyFieldId = keyValue,
                 ActionBy = "",
                 ActionUrl = "",
                 ValueBefore = JsonConvert.SerializeObject(oldObject),

@@ -89,6 +89,8 @@
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\SampleViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\ISampleService.cs" />
+    <Compile Include="Services\SampleService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AzR.AuditLog.DataAccess\AzR.AuditLog.DataAccess.csproj">
