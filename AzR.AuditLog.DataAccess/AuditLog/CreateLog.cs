@@ -1,5 +1,4 @@
-﻿using AzR.AuditLog.DataAccess.Entities;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity.Infrastructure;
@@ -9,9 +8,8 @@ namespace AzR.AuditLog.DataAccess.AuditLog
 {
     public class CreateLog
     {
-        public static void Create<T>(ActionType action, string keyFieldId, T oldObject, T newObject)
+        public static AuditLog Create<T>(ActionType action, string keyFieldId, T oldObject, T newObject)
         {
-            // get the difference
             var deltaList = newObject.Compare(oldObject);
             var audit = new AuditLog
             {
@@ -26,11 +24,7 @@ namespace AzR.AuditLog.DataAccess.AuditLog
                 ValueAfter = JsonConvert.SerializeObject(newObject),
                 ValueChange = JsonConvert.SerializeObject(deltaList)
             };
-            // if use xml instead of json, can use xml annotation to describe field names etc better
-            var ent = new ApplicationDbContext();
-            ent.AuditLogs.Add(audit);
-            ent.SaveChanges();
-
+            return audit;
         }
         public static AuditLog Create(DbEntityEntry entry, int status)
         {
