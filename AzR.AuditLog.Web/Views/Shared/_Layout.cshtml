@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audit example</title>
+    <title>AzR APP</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 
@@ -11,30 +11,51 @@
     @Scripts.Render("~/bundles/bootstrap")
 </head>
 <body>
-<div class="container body-content">
-    
-
-    <div id="mainContent">
-        @RenderBody()
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("AzR APP", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
     </div>
-    @{Html.RenderPartial("_Modal");}
+
+    <div class="container body-content">
+
+
+        <div id="mainContent">
+            @RenderBody()
+        </div>
+        @{Html.RenderPartial("_Modal");}
 
 
 
-    <hr/>
+        <hr />
+        <footer></footer>
+    </div>
+
     <footer>
+        <p>&copy; @DateTime.Now.Year - AzR APP</p>
     </footer>
-</div>
-@Scripts.Render("~/bundles/jqueryval")
-@Scripts.Render("~/bundles/jqueryunobtrusive")
-<script>
-    $(function () {
-        $(document).ajaxComplete(function () {
-            $.validator.unobtrusive.parse(document);
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/jqueryunobtrusive")
+    <script>
+        $(function () {
+            $(document).ajaxComplete(function () {
+                $.validator.unobtrusive.parse(document);
+            });
         });
-        $('#dashboard').click();
-    });
-</script>
+    </script>
     @RenderSection("scripts", required: false)
 </body>
 </html>
