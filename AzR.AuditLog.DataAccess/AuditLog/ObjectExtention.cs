@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -47,5 +48,11 @@ namespace AzR.AuditLog.DataAccess.AuditLog
                     }).ToList();
         }
 
+
+        public static void WriteDbLog(this string ex)
+        {
+            var startupPath = new DirectoryInfo(Path.GetDirectoryName(Uri.UnescapeDataString(new UriBuilder(Assembly.GetExecutingAssembly().CodeBase).Path))).Parent.FullName;
+            File.AppendAllText(startupPath + "\\Log.txt", ex + Environment.NewLine);
+        }
     }
 }

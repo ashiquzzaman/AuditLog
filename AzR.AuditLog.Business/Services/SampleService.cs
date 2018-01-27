@@ -27,6 +27,7 @@ namespace AzR.AuditLog.Business.Services
             model.FirstName = sample.FirstName;
             model.LastName = sample.LastName;
             model.DateOfBirth = sample.DateOfBirth;
+            model.Active = sample.Active;
             return model;
         }
 
@@ -38,10 +39,10 @@ namespace AzR.AuditLog.Business.Services
         }
 
 
-        public List<SampleViewModel> GetAll(bool showDeleted)
+        public List<SampleViewModel> GetAll(bool showAll)
         {
 
-            var results = showDeleted
+            var results = showAll
                 ? _sample.GetAll.ToList()
                 : _sample.FindAll(s => s.Active).ToList();
 
@@ -52,30 +53,33 @@ namespace AzR.AuditLog.Business.Services
                 LastName = record.LastName,
                 DateOfBirth = record.DateOfBirth,
                 Active = record.Active
-            })
-                .ToList();
+            }).ToList();
+
         }
 
-        public bool Update(SampleViewModel viewModel)
+        public bool Update(SampleViewModel model)
         {
-            var result = _sample.Find(s => s.Id == viewModel.Id);
-            if (result == null) return false;
-
-            result.FirstName = viewModel.FirstName;
-            result.LastName = viewModel.LastName;
-            result.DateOfBirth = viewModel.DateOfBirth;
-            _sample.Update(result);
+            var sample = new Sample
+            {
+                Id = model.Id,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                DateOfBirth = model.DateOfBirth,
+                Active = model.Active
+            };
+            _sample.Update(sample);
             return true;
         }
 
-        public void Create(SampleViewModel viewModel)
+        public void Create(SampleViewModel model)
         {
 
             var sample = new Sample
             {
-                FirstName = viewModel.FirstName,
-                LastName = viewModel.LastName,
-                DateOfBirth = viewModel.DateOfBirth
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                DateOfBirth = model.DateOfBirth,
+                Active = model.Active
             };
             _sample.Create(sample);
         }

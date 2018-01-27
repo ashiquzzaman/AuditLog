@@ -8,9 +8,9 @@ namespace AzR.AuditLog.Business.Services
     {
         SampleViewModel Get(int id);
         void Delete(int id);
-        List<SampleViewModel> GetAll(bool showDeleted);
-        bool Update(SampleViewModel viewModel);
-        void Create(SampleViewModel viewModel);
+        List<SampleViewModel> GetAll(bool showAll);
+        bool Update(SampleViewModel model);
+        void Create(SampleViewModel model);
         List<ChangeLog> GetAudit(int id);
     }
 }

@@ -19,14 +19,13 @@ namespace AzR.AuditLog.DataAccess.Entities
 
         }
 
-
-
         public override int SaveChanges()
         {
             try
             {
                 using (var scope = new TransactionScope())
                 {
+                    Database.Log = message => message.WriteDbLog();
                     var addedEntries = ChangeTracker.Entries().Where(e => e.State == EntityState.Added).ToList();
                     var modifiedEntries = ChangeTracker.Entries().Where(e => e.State == EntityState.Modified).ToList();
                     var deleteEntries = ChangeTracker.Entries().Where(e => e.State == EntityState.Deleted).ToList();
@@ -36,7 +35,7 @@ namespace AzR.AuditLog.DataAccess.Entities
                     {
                         foreach (var entry in deleteEntries)
                         {
-                            var audit = CreateLog.Create(entry, 3);
+                            var audit = AuditLog.AuditLog.Create(entry, 3);
                             AuditLogs.Add(audit);
                         }
                         changes = base.SaveChanges();
@@ -46,7 +45,7 @@ namespace AzR.AuditLog.DataAccess.Entities
                     {
                         foreach (var entry in modifiedEntries)
                         {
-                            var audit = CreateLog.Create(entry, 2);
+                            var audit = AuditLog.AuditLog.Create(entry, 2);
                             AuditLogs.Add(audit);
                         }
                         changes = base.SaveChanges();
@@ -54,10 +53,10 @@ namespace AzR.AuditLog.DataAccess.Entities
 
                     if (addedEntries.Count > 0)
                     {
-
+                        base.SaveChanges();
                         foreach (var entry in addedEntries)
                         {
-                            var audit = CreateLog.Create(entry, 1);
+                            var audit = AuditLog.AuditLog.Create(entry, 1);
                             AuditLogs.Add(audit);
                         }
 

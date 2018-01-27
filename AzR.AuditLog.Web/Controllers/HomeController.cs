@@ -17,7 +17,9 @@ namespace AzR.AuditLog.Web.Controllers
 
         public ActionResult Index(bool ShowDeleted = false)
         {
-            return View(_sample.GetAll(ShowDeleted));
+            var model = _sample.GetAll(ShowDeleted);
+
+            return View(model);
         }
 
 
@@ -44,15 +46,15 @@ namespace AzR.AuditLog.Web.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Save(SampleViewModel Rec)
+        public ActionResult Save(SampleViewModel model)
         {
-            if (Rec.Id == -1)
+            if (model.Id == -1)
             {
-                _sample.Create(Rec);
+                _sample.Create(model);
             }
             else
             {
-                _sample.Update(Rec);
+                _sample.Update(model);
             }
             return
                 Json(

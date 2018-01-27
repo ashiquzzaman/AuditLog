@@ -164,7 +164,10 @@ namespace AzR.AuditLog.DataAccess.Repositories
 
         public IQueryable<T> FindAll(Expression<Func<T, bool>> predicate)
         {
-            return DbSet.Where(predicate).AsQueryable();
+            var result = DbSet.Where(predicate).AsQueryable();
+
+            return result;
+
         }
 
         public T Create(T t)

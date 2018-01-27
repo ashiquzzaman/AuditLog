@@ -1,0 +1,62 @@
+Opened connection at 27-Jan-18 10:14:47 PM +06:00
+
+INSERT [dbo].[Samples]([FirstName], [LastName], [DateOfBirth], [Active])
+VALUES (@0, @1, @2, @3)
+SELECT [Id]
+FROM [dbo].[Samples]
+WHERE @@ROWCOUNT > 0 AND [Id] = scope_identity()
+
+
+-- @0: 'MD' (Type = String, Size = -1)
+
+-- @1: 'Khan' (Type = String, Size = -1)
+
+-- @2: '26-Dec-99 12:00:00 AM' (Type = DateTime2)
+
+-- @3: 'True' (Type = Boolean)
+
+-- Executing at 27-Jan-18 10:14:47 PM +06:00
+
+-- Completed in 20 ms with result: SqlDataReader
+
+
+
+Closed connection at 27-Jan-18 10:14:47 PM +06:00
+
+Opened connection at 27-Jan-18 10:14:47 PM +06:00
+
+INSERT [dbo].[AuditLogs]([LoginId], [KeyFieldId], [ActionTime], [EntityName], [ValueBefore], [ValueAfter], [ValueChange], [ActionType], [ActionBy], [ActionUrl])
+VALUES (@0, @1, @2, @3, @4, @5, @6, @7, @8, @9)
+SELECT [Id]
+FROM [dbo].[AuditLogs]
+WHERE @@ROWCOUNT > 0 AND [Id] = scope_identity()
+
+
+-- @0: '0' (Type = Int64)
+
+-- @1: '5' (Type = String, Size = 128)
+
+-- @2: '27-Jan-18 10:14:47 PM' (Type = DateTime2)
+
+-- @3: 'Sample' (Type = String, Size = 256)
+
+-- @4: '{"Id":0,"FirstName":null,"LastName":null,"DateOfBirth":"0001-01-01T00:00:00","Active":false}' (Type = String, Size = -1)
+
+-- @5: '{"Id":5,"FirstName":"MD","LastName":"Khan","DateOfBirth":"1999-12-26T00:00:00","Active":true}' (Type = String, Size = -1)
+
+-- @6: '[{"FieldName":"Id","ValueBefore":null,"ValueAfter":null},{"FieldName":"FirstName","ValueBefore":null,"ValueAfter":"MD"},{"FieldName":"LastName","ValueBefore":null,"ValueAfter":"Khan"},{"FieldName":"DateOfBirth","ValueBefore":null,"ValueAfter":"26-Dec-99 12:00:00 AM"},{"FieldName":"Active","ValueBefore":null,"ValueAfter":"True"}]' (Type = String, Size = -1)
+
+-- @7: '1' (Type = Int32)
+
+-- @8: '' (Type = String, Size = -1)
+
+-- @9: '' (Type = String, Size = -1)
+
+-- Executing at 27-Jan-18 10:14:47 PM +06:00
+
+-- Completed in 10 ms with result: SqlDataReader
+
+
+
+Closed connection at 27-Jan-18 10:14:48 PM +06:00
+

@@ -6,7 +6,7 @@ namespace AzR.AuditLog.DataAccess.AuditLog
         Create = 1,
         Update = 2,
         Delete = 3,
-        Remove = 4,
+        Cancel = 4,
 
     }
 }

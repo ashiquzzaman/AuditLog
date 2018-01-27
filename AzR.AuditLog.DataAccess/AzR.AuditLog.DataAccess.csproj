@@ -61,7 +61,6 @@
     <Compile Include="AuditLog\ActionType.cs" />
     <Compile Include="AuditLog\AuditLog.cs" />
     <Compile Include="AuditLog\ChangeLog.cs" />
-    <Compile Include="AuditLog\CreateLog.cs" />
     <Compile Include="AuditLog\EntityValue.cs" />
     <Compile Include="AuditLog\IgnoreLogAttribute.cs" />
     <Compile Include="AuditLog\ObjectChangeLog.cs" />
