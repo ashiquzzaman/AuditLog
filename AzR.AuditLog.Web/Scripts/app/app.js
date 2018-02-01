@@ -1,4 +1,5 @@
 ﻿/// <reference path="../bootbox.js" />
+/// <reference path="../app/underscore.js" />
 
 function closeModal() {
     $('#myModal').modal('hide');
@@ -79,7 +80,7 @@ function render(tmplName, tmplData) {
         $.ajax({
             url: tmplUrl,
             method: 'GET',
-            dataType: 'html', //** Must add 
+            dataType: 'html',
             async: false,
             success: function (data) {
                 tmplString = data;
