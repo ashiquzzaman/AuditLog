@@ -15,3 +15,6 @@
 .dl-horizontal dt {
     white-space: normal;
 }
+td span {
+    cursor: pointer;
+}

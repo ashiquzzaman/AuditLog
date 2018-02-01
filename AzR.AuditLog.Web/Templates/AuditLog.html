@@ -2,31 +2,29 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true"><i class="fa fa-times-circle"></i></span>
         </button>
-        <h4 class="modal-title">Add Record</h4>
+        <h4 class="modal-title">Logs</h4>
     </div>
     <div class="modal-body">
         <div class="table-responsive">
-            <table class="table table-condensed" cellpadding="5">
+            <table class="table table-condensed">
                 <tbody>
-                    <% _.each(auditLogs, function(auditLog){%>
-
-
-                    <tr class="active">
-                        <td colspan="2">Event date: <%= auditLog.ActionTime %></td>
-                        <td>Action type: <%= auditLog.ActionTypeName %></td>
-                    </tr>
-                    <tr class="text-warning">
-                        <td>Field name</td>
-                        <td>Before change</td>
-                        <td>After change</td>
-                    </tr>
-                    <% _.each(auditLog.Changes, function(change){%>
-                    <tr>
-                        <td><%= change.FieldName %></td>
-                        <td><%= change.ValueBefore %></td>
-                        <td><%= change.ValueAfter %></td>
-                    </tr>
-                    <%});})%>
+                {{_.each(auditLogs, function(auditLog){}}
+                <tr class="active">
+                    <td colspan="2">Event date: {{= auditLog.ActionTime}}</td>
+                    <td>Action type: {{= auditLog.ActionTypeName}}</td>
+                </tr>
+                <tr class="text-warning">
+                    <td>Field name</td>
+                    <td>Before change</td>
+                    <td>After change</td>
+                </tr>
+                {{_.each(auditLog.Changes, function(change){}}
+                <tr>
+                    <td>{{= change.FieldName}}</td>
+                    <td>{{= change.ValueBefore}}</td>
+                    <td>{{= change.ValueAfter}}</td>
+                </tr>
+                {{});})}}
                 </tbody>
             </table>
         </div>

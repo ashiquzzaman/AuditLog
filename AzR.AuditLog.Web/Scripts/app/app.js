@@ -85,9 +85,12 @@ function render(tmplName, tmplData) {
                 tmplString = data;
             }
         });
-        //_.templateSettings = {
-        //    interpolate: /\{\{(.+?)\}\}/g
-        //};
+        _.templateSettings = {
+            evaluate: /\{\{(.+?)\}\}/g,
+            interpolate: /\{\{=(.+?)\}\}/g,
+            escape: /\{\{-(.+?)\}\}/g
+        };
+
         render.tmpl_cache[tmplName] = _.template(tmplString);
     }
 
