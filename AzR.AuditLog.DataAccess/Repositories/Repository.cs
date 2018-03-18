@@ -7,12 +7,13 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace AzR.AuditLog.DataAccess.Repositories
 {
     public abstract class Repository<T> : IRepository<T> where T : class
     {
-        protected DbContext Context;
+        private DbContext _context;
         private bool _shareContext;
         private bool disposed = false;
         public bool ShareContext
@@ -23,14 +24,14 @@ namespace AzR.AuditLog.DataAccess.Repositories
 
         public Repository(DbContext context)
         {
-            Context = context;
+            _context = context;
         }
 
         public int SaveChanges()
         {
             try
             {
-                return Context.SaveChanges();
+                return CreateLog();
             }
             catch (DbEntityValidationException ex)
             {
@@ -57,7 +58,7 @@ namespace AzR.AuditLog.DataAccess.Repositories
         {
             get
             {
-                return Context.Set<T>();
+                return _context.Set<T>();
             }
         }
 
@@ -78,15 +79,15 @@ namespace AzR.AuditLog.DataAccess.Repositories
         }
         protected virtual void Dispose(bool disposing)
         {
-            if (ShareContext || Context == null) return;
+            if (ShareContext || _context == null) return;
             if (!disposed)
             {
                 if (disposing)
                 {
-                    if (Context != null)
+                    if (_context != null)
                     {
-                        Context.Dispose();
-                        Context = null;
+                        _context.Dispose();
+                        _context = null;
                     }
                 }
             }
@@ -177,7 +178,7 @@ namespace AzR.AuditLog.DataAccess.Repositories
 
             if (!ShareContext)
             {
-                Context.SaveChanges();
+                SaveChanges();
             }
 
             return t;
@@ -185,13 +186,13 @@ namespace AzR.AuditLog.DataAccess.Repositories
 
         public int Update(T t)
         {
-            var entry = Context.Entry(t);
+            var entry = _context.Entry(t);
 
             DbSet.Attach(t);
 
             entry.State = EntityState.Modified;
 
-            return !ShareContext ? Context.SaveChanges() : 0;
+            return !ShareContext ? SaveChanges() : 0;
         }
 
         public int Delete(T t)
@@ -199,7 +200,7 @@ namespace AzR.AuditLog.DataAccess.Repositories
             //  Context.Entry(t).State = EntityState.Deleted;
             DbSet.Remove(t);
 
-            return !ShareContext ? Context.SaveChanges() : 0;
+            return !ShareContext ? SaveChanges() : 0;
         }
 
         public bool IsExist(Expression<Func<T, bool>> predicate)
@@ -215,16 +216,16 @@ namespace AzR.AuditLog.DataAccess.Repositories
             {
                 DbSet.Remove(record);
             }
-            return !ShareContext ? Context.SaveChanges() : 0;
+            return !ShareContext ? SaveChanges() : 0;
         }
         public IEnumerable<TEntity> ExecuteQuery<TEntity>(string sqlQuery, params object[] parameters)
         {
-            return Context.Database.SqlQuery<TEntity>(sqlQuery, parameters);
+            return _context.Database.SqlQuery<TEntity>(sqlQuery, parameters);
         }
 
         public int ExecuteCommand(string sqlCommand, params object[] parameters)
         {
-            return Context.Database.ExecuteSqlCommand(sqlCommand, parameters);
+            return _context.Database.ExecuteSqlCommand(sqlCommand, parameters);
         }
         #endregion
 
@@ -245,17 +246,17 @@ namespace AzR.AuditLog.DataAccess.Repositories
         public async Task<T> CreateAsync(T entity)
         {
             DbSet.Add(entity);
-            await Context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return entity;
         }
         public async Task<int> UpdateAsync(T item)
         {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
-            var entry = Context.Entry(item);
+            var entry = _context.Entry(item);
             DbSet.Attach(item);
             entry.State = EntityState.Modified;
-            return await Context.SaveChangesAsync();
+            return await _context.SaveChangesAsync();
         }
         public async Task<int> UpdateAsync(Expression<Func<T, bool>> predicate)
         {
@@ -266,18 +267,18 @@ namespace AzR.AuditLog.DataAccess.Repositories
             }
             foreach (var record in records)
             {
-                var entry = Context.Entry(record);
+                var entry = _context.Entry(record);
 
                 DbSet.Attach(record);
 
                 entry.State = EntityState.Modified;
             }
-            return await Context.SaveChangesAsync();
+            return await _context.SaveChangesAsync();
         }
         public async Task<int> DeleteAsync(T t)
         {
             DbSet.Remove(t);
-            return await Context.SaveChangesAsync();
+            return await _context.SaveChangesAsync();
         }
         public async Task<int> DeleteAsync(Expression<Func<T, bool>> predicate)
         {
@@ -290,7 +291,7 @@ namespace AzR.AuditLog.DataAccess.Repositories
             {
                 DbSet.Remove(record);
             }
-            return await Context.SaveChangesAsync();
+            return await _context.SaveChangesAsync();
         }
         public async Task<int> CountAsync()
         {
@@ -341,7 +342,7 @@ namespace AzR.AuditLog.DataAccess.Repositories
         {
             try
             {
-                return await Context.SaveChangesAsync();
+                return await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -378,6 +379,60 @@ namespace AzR.AuditLog.DataAccess.Repositories
         }
 
         #endregion
+
+
+
+        private int CreateLog()
+        {
+            using (var scope = new TransactionScope())
+            {
+                var changes = 0;
+                var addedEntries = _context.ChangeTracker.Entries().Where(e => e.State == EntityState.Added).ToList();
+
+                if (addedEntries.Count > 0)
+                {
+                    _context.SaveChanges();
+                    foreach (var entry in addedEntries)
+                    {
+                        var audit = AuditLog.AuditLog.Create(entry, 1);
+                        if (audit == null) continue;
+                        var auditlog = _context.Set(typeof(AuditLog.AuditLog));
+                        auditlog.Add(audit);
+                    }
+
+                    changes = _context.SaveChanges();
+                }
+                var deleteEntries = _context.ChangeTracker.Entries().Where(e => e.State == EntityState.Deleted).ToList();
+                if (deleteEntries.Count > 0)
+                {
+                    foreach (var entry in deleteEntries)
+                    {
+                        var audit = AuditLog.AuditLog.Create(entry, 3);
+                        if (audit == null) continue;
+                        var auditlog = _context.Set(typeof(AuditLog.AuditLog));
+                        auditlog.Add(audit);
+                    }
+                    changes = _context.SaveChanges();
+                }
+                var modifiedEntries = _context.ChangeTracker.Entries().Where(e => e.State == EntityState.Modified).ToList();
+
+                if (modifiedEntries.Count > 0)
+                {
+                    foreach (var entry in modifiedEntries)
+                    {
+                        var audit = AuditLog.AuditLog.Create(entry, 2);
+                        if (audit == null) continue;
+                        var auditlog = _context.Set(typeof(AuditLog.AuditLog));
+                        auditlog.Add(audit);
+                    }
+                    changes = _context.SaveChanges();
+                }
+
+                scope.Complete();
+                return changes;
+            }
+        }
+
 
     }
 }
